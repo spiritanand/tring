@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+@theme {
+  --color-paper: #0c0c0a;
+  --color-wash: #131311;
+  --color-raise: #1a1a17;
+  --color-line: #262622;
+  --color-line-strong: #3b3b35;
+  --color-ink: #f4f3ee;
+  --color-ink-2: #cbc9bf;
+  --color-muted: #918f85;
+  --color-brand: #facc15;
+  --color-brand-hover: #fde047;
+  --color-on-brand: #1a1500;
+
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.45;
+  --text-heading: 1.25rem;
+  --text-heading--line-height: 1.3;
+  --text-heading--letter-spacing: -0.01em;
+  --text-heading--font-weight: 500;
+  --text-title: 1.75rem;
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 500;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-paper);
+}
+
+body {
+  color: var(--color-ink);
+  caret-color: var(--color-brand);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-brand);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-brand) 35%, transparent);
+  color: var(--color-ink);
+}
+
+:where(a, button, summary, [tabindex], input, textarea, select):focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .label {
+    @apply text-meta font-medium text-muted;
+  }
+  .card {
+    @apply rounded-lg border border-line bg-wash p-4;
+  }
+  .btn,
+  .btn-ghost {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium whitespace-nowrap transition-colors active:translate-y-px disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn {
+    @apply bg-brand text-on-brand hover:bg-brand-hover;
+  }
+  .btn-ghost {
+    @apply border border-line-strong bg-transparent text-ink hover:border-muted hover:bg-raise;
+  }
+  .btn-sm {
+    @apply h-8 gap-1.5 px-3 text-meta;
+  }
+  .input {
+    @apply h-10 w-full rounded-md border border-line-strong bg-paper px-3 text-sm text-ink transition-colors placeholder:text-muted hover:border-muted;
+  }
+  .chip,
+  .chip-ok,
+  .chip-warn,
+  .chip-bad,
+  .chip-mute {
+    @apply inline-flex h-6 items-center gap-1.5 rounded-sm px-2 text-xs font-medium whitespace-nowrap tabular-nums;
+  }
+  .chip-ok {
+    @apply bg-emerald-400/10 text-emerald-300;
+  }
+  .chip-warn {
+    @apply bg-brand/10 text-brand;
+  }
+  .chip-bad {
+    @apply bg-rose-400/10 text-rose-300;
+  }
+  .chip-mute {
+    @apply bg-line text-ink-2;
+  }
+  .dot {
+    @apply inline-block size-1.5 rounded-full bg-current;
+  }
+}
+
+@layer base {
+  button:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+}
