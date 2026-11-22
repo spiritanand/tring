@@ -59,6 +59,8 @@ export const t = {
   offerAtTime: (minutes: number) =>
     `${fmtTime(minutes)} is free on these days.`,
   nearest: "These are the nearest free times.",
+  snapped: (asked: number, start: number) =>
+    `Appointments don't start at ${fmtTime(asked)}. The closest start time is ${fmtTime(start)}, which is free.`,
   noSlots: (clinic: Clinic) =>
     `There are no free times in the next ${HORIZON_DAYS} days. Please call the clinic on ${clinic.phone}.`,
   problem: (

@@ -238,12 +238,12 @@ class Turn {
       )
         hour += 12;
       const dates = upcomingDates(nowMs, HORIZON_DAYS);
-      const minutesFor = (d: string) => {
-        const resolved = when.partOfDay
+      const askedFor = (d: string) =>
+        when.partOfDay
           ? hour * 60 + minute
           : resolveBareHour(d, hour, minute, clinic);
-        return snapToGrid(d, resolved, clinic) ?? resolved;
-      };
+      const minutesFor = (d: string) =>
+        snapToGrid(d, askedFor(d), clinic) ?? askedFor(d);
       if (!date) {
         date =
           draft.date && dates.includes(draft.date)
@@ -276,10 +276,12 @@ class Turn {
       const result = this.check(date, minutes);
       if (result.ok) {
         draft.selectedStart = result.startAt;
+        const asked = askedFor(date);
+        if (asked !== minutes) this.say(t.snapped(asked, minutes));
         this.step(
           "tool",
           "find_slots",
-          `${fmtSlot(result.startAt)} → free`,
+          `${fmtSlot(result.startAt)} → free${asked !== minutes ? ` (nearest start to ${fmtTime(asked)})` : ""}`,
           "ok",
         );
         return;

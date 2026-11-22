@@ -233,6 +233,17 @@ describe("booking", () => {
     expect(slotsOf(far.reply).length).toBe(3);
   });
 
+  it("tells the patient when their time is moved to the nearest appointment start", async () => {
+    const turn = await say(
+      "snap",
+      "wednesday 10:05",
+      parsed("book", { date: "2026-11-25", hour: 10, minute: 5 }),
+    );
+    expect(texts(turn.reply)).toContain(
+      "Appointments don't start at 10:05 AM. The closest start time is 10:00 AM",
+    );
+  });
+
   it("refuses a phone number that already has an upcoming booking", async () => {
     await tap("zoe", { kind: "slot", startAt: tue(18) });
     await say("zoe", "Zoe", parsed("book", { patientName: "Zoe" }));
