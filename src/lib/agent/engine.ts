@@ -1126,7 +1126,7 @@ async function handleText(turn: Turn, raw: string, parse: Parser) {
       turn.step(
         "guard",
         "off topic",
-        `strike ${state.strikes} of ${MAX_STRIKES} · no action taken`,
+        `BLOCKED · not a booking request · no action taken (strike ${state.strikes} of ${MAX_STRIKES})`,
         "blocked",
       );
       if (state.strikes >= MAX_STRIKES) {
