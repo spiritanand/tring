@@ -35,7 +35,7 @@ export function Nav() {
             key={link.href}
             href={link.href}
             aria-current={current ? "page" : undefined}
-            className={`rounded-md px-2.5 py-1.5 text-sm transition-colors ${
+            className={`rounded-md px-2 py-1.5 text-sm whitespace-nowrap transition-colors sm:px-2.5 ${
               current ? "bg-raise text-ink" : "text-muted hover:text-ink"
             }`}
           >

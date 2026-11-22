@@ -1,7 +1,7 @@
 import { listTurns, loadSession } from "@/lib/agent/session";
 import { lookupUpcoming } from "@/lib/bookings";
 import { getClinic } from "@/lib/clinic";
-import { ensureSessionId } from "@/lib/session-cookie";
+import { ensureSessionId, startNewSession } from "@/lib/session-cookie";
 
 export async function GET() {
   const sessionId = await ensureSessionId();
@@ -26,4 +26,10 @@ export async function GET() {
       endAt: current.endAt,
     },
   });
+}
+
+// A new chat is a new session cookie. Earlier bookings stay in the database and are reached by booking ID.
+export async function POST() {
+  await startNewSession();
+  return Response.json({ ok: true });
 }

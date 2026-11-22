@@ -1,6 +1,11 @@
 "use client";
 
-import { PanelRightClose, PanelRightOpen, SendHorizontal } from "lucide-react";
+import {
+  PanelRightClose,
+  PanelRightOpen,
+  SendHorizontal,
+  SquarePen,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Tap, TurnInput, TurnRecord } from "@/lib/agent/types";
 import { fmtSlot } from "@/lib/time";
@@ -89,6 +94,22 @@ export function Chat() {
     [load],
   );
 
+  const newChat = async () => {
+    if (busy.current) return;
+    busy.current = true;
+    setFailed(false);
+    try {
+      await fetch("/api/session", { method: "POST" });
+      setTurns([]);
+      setDraft("");
+      await load();
+    } catch {
+      setFailed(true);
+    } finally {
+      busy.current = false;
+    }
+  };
+
   const sendText = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -105,22 +126,36 @@ export function Chat() {
           <Brand />
           <Nav />
         </div>
-        <button
-          type="button"
-          className="btn-ghost btn-sm"
-          aria-pressed={showSteps}
-          onClick={() => setShowSteps((v) => !v)}
-        >
-          {showSteps ? (
-            <PanelRightClose size={14} strokeWidth={1.75} />
-          ) : (
-            <PanelRightOpen size={14} strokeWidth={1.75} />
-          )}
-          <span className="hidden sm:inline">
-            {showSteps ? "Hide agent steps" : "Show agent steps"}
-          </span>
-          <span className="sm:hidden">Steps</span>
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            className="btn-ghost btn-sm px-2 sm:px-3"
+            aria-label="Start a new chat"
+            disabled={
+              Boolean(sending) || (turns.length === 0 && !data?.current)
+            }
+            onClick={newChat}
+          >
+            <SquarePen size={14} strokeWidth={1.75} />
+            <span className="hidden sm:inline">New chat</span>
+          </button>
+          <button
+            type="button"
+            className="btn-ghost btn-sm px-2 sm:px-3"
+            aria-pressed={showSteps}
+            aria-label={showSteps ? "Hide agent steps" : "Show agent steps"}
+            onClick={() => setShowSteps((v) => !v)}
+          >
+            {showSteps ? (
+              <PanelRightClose size={14} strokeWidth={1.75} />
+            ) : (
+              <PanelRightOpen size={14} strokeWidth={1.75} />
+            )}
+            <span className="hidden sm:inline">
+              {showSteps ? "Hide agent steps" : "Show agent steps"}
+            </span>
+          </button>
+        </div>
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">

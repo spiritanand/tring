@@ -9,8 +9,10 @@ export async function readSessionId(): Promise<string | null> {
 }
 
 export async function ensureSessionId(): Promise<string> {
-  const existing = await readSessionId();
-  if (existing) return existing;
+  return (await readSessionId()) ?? startNewSession();
+}
+
+export async function startNewSession(): Promise<string> {
   const id = nanoid(24);
   (await cookies()).set({
     name: NAME,
