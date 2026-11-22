@@ -10,8 +10,7 @@
     "format": "biome format --write",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:push": "drizzle-kit push",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.122",

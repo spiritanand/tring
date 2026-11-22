@@ -8,7 +8,6 @@ A chat agent that books, cancels and reschedules appointments for a single-docto
 pnpm install
 cp .env.example .env.local   # then add OPENAI_API_KEY
 pnpm db:push
-pnpm db:seed
 pnpm dev
 ```
 
