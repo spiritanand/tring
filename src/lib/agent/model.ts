@@ -84,9 +84,10 @@ export async function parseTurn(
     system: SYSTEM,
     prompt: buildPrompt(ctx),
     timeout: 8000,
+    maxOutputTokens: 400,
     maxRetries: 1,
     providerOptions: {
-      openai: { reasoningEffort: process.env.TRING_REASONING ?? "low" },
+      openai: { reasoningEffort: process.env.TRING_REASONING ?? "none" },
     },
   });
   return { parsed: result.output, ms: Date.now() - started };

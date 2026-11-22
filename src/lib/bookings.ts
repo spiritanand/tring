@@ -6,11 +6,27 @@ export type Booking = typeof schema.bookings.$inferSelect;
 
 const ID_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 const ID_PATTERN = /^[2-9A-HJ-NP-Z]{8}$/;
-export const newBookingId = customAlphabet(ID_ALPHABET, 8);
+const randomId = customAlphabet(ID_ALPHABET, 8);
+
+// Every ID carries a digit so that an ordinary word in a message can never be mistaken for one.
+export function newBookingId(): string {
+  for (;;) {
+    const id = randomId();
+    if (/\d/.test(id)) return id;
+  }
+}
+
+export function findBookingId(text: string): string | null {
+  const match = text
+    .toUpperCase()
+    .match(/(?<![A-Z0-9])[2-9A-HJ-NP-Z]{4}-?[2-9A-HJ-NP-Z]{4}(?![A-Z0-9])/g);
+  const id = match?.map((m) => m.replace("-", "")).find((m) => /\d/.test(m));
+  return id ?? null;
+}
 
 export function normalizeBookingId(raw: string): string | null {
   const id = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
-  return ID_PATTERN.test(id) ? id : null;
+  return ID_PATTERN.test(id) && /\d/.test(id) ? id : null;
 }
 
 export function displayBookingId(id: string): string {
@@ -74,7 +90,8 @@ export async function createBooking(
     INSERT INTO bookings (id, patient_name, phone, reason, start_at, end_at, status, session_id, created_at, updated_at)
     SELECT ${input.id}, ${input.patientName}, ${input.phone}, ${input.reason}, ${input.startAt}, ${input.endAt},
            'confirmed', ${input.sessionId}, ${nowMs}, ${nowMs}
-    WHERE NOT EXISTS (SELECT 1 FROM bookings WHERE id = ${input.id})
+    WHERE ${input.startAt} > ${nowMs}
+      AND NOT EXISTS (SELECT 1 FROM bookings WHERE id = ${input.id})
       AND NOT EXISTS (
         SELECT 1 FROM bookings
         WHERE status = 'confirmed' AND start_at < ${input.endAt + buffer} AND end_at > ${input.startAt - buffer})
@@ -139,6 +156,23 @@ export async function rescheduleBooking(
         ? "slot_taken"
         : "not_found",
   };
+}
+
+export async function phoneHasUpcoming(
+  phone: string,
+  nowMs: number,
+): Promise<boolean> {
+  const [row] = await db
+    .select({ id: schema.bookings.id })
+    .from(schema.bookings)
+    .where(
+      and(
+        eq(schema.bookings.status, "confirmed"),
+        eq(schema.bookings.phone, phone),
+        gt(schema.bookings.startAt, nowMs),
+      ),
+    );
+  return Boolean(row);
 }
 
 export async function listBookings(): Promise<Booking[]> {

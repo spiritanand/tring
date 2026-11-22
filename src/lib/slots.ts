@@ -10,7 +10,7 @@ import {
 } from "./time";
 
 export const HORIZON_DAYS = 14;
-export const LEAD_MINUTES = 10;
+export const LEAD_MINUTES = 15;
 
 export type SlotConfig = {
   slotMinutes: number;

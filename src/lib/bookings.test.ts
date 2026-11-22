@@ -133,4 +133,14 @@ describe("guarded booking writes", () => {
       /^[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{4}$/,
     );
   });
+
+  it("finds a booking ID in a sentence without mistaking words or dates for one", () => {
+    expect(lib.findBookingId("please cancel k7qm-4txp thanks")).toBe(
+      "K7QM4TXP",
+    );
+    expect(lib.findBookingId("cancel K7QM4TXP")).toBe("K7QM4TXP");
+    expect(lib.findBookingId("reschedule to thursday")).toBeNull();
+    expect(lib.findBookingId("move it to june 23rd schedule")).toBeNull();
+    expect(lib.findBookingId("my number is 9876543210")).toBeNull();
+  });
 });
