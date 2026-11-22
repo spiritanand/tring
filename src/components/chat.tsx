@@ -1,15 +1,11 @@
 "use client";
 
-import {
-  BellRing,
-  PanelRightClose,
-  PanelRightOpen,
-  SendHorizontal,
-} from "lucide-react";
+import { PanelRightClose, PanelRightOpen, SendHorizontal } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Tap, TurnInput, TurnRecord } from "@/lib/agent/types";
 import { fmtSlot } from "@/lib/time";
 import { BlockView } from "./blocks";
+import { Brand, Nav } from "./nav";
 import { StepsPanel } from "./steps";
 
 type ClinicInfo = { name: string; doctorName: string; phone: string };
@@ -53,11 +49,17 @@ export function Chat() {
     load().catch(() => setFailed(true));
   }, [load]);
 
-  const turnCount = turns.length;
+  const threadRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (turnCount >= 0 || sending)
-      endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [turnCount, sending]);
+    const thread = threadRef.current;
+    if (!thread) return;
+    // The slot picker loads after its turn renders, so follow the thread's height rather than the turn count.
+    const observer = new ResizeObserver(() =>
+      endRef.current?.scrollIntoView({ block: "end" }),
+    );
+    observer.observe(thread);
+    return () => observer.disconnect();
+  }, []);
 
   const send = useCallback(
     async (input: TurnInput) => {
@@ -99,16 +101,9 @@ export function Chat() {
   return (
     <div className="flex h-dvh flex-col">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-line px-4 sm:px-6">
-        <div className="flex items-center gap-2.5">
-          <BellRing size={18} strokeWidth={1.75} className="text-brand" />
-          <span className="text-[20px] font-semibold tracking-[-0.03em]">
-            tring<span className="text-brand">.</span>
-          </span>
-          {clinic && (
-            <span className="hidden text-meta text-muted sm:inline">
-              booking desk · {clinic.name}
-            </span>
-          )}
+        <div className="flex min-w-0 items-center gap-3 sm:gap-5">
+          <Brand />
+          <Nav />
         </div>
         <button
           type="button"
@@ -121,14 +116,20 @@ export function Chat() {
           ) : (
             <PanelRightOpen size={14} strokeWidth={1.75} />
           )}
-          {showSteps ? "Hide agent steps" : "Show agent steps"}
+          <span className="hidden sm:inline">
+            {showSteps ? "Hide agent steps" : "Show agent steps"}
+          </span>
+          <span className="sm:hidden">Steps</span>
         </button>
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <section className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-6 sm:px-6">
+            <div
+              ref={threadRef}
+              className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-6 sm:px-6"
+            >
               <div className="flex flex-col gap-3">
                 <p className="text-[15px] leading-relaxed">
                   {clinic
